@@ -1,4 +1,6 @@
 using EthereumT.DAL.Context;
+using EthereumT.DAL.Repositories.Base;
+using EthereumT.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +13,8 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connect
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<RepositoryAsync<Wallet>>();
 
 var app = builder.Build();
 
