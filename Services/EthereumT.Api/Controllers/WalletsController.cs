@@ -23,5 +23,12 @@ namespace EthereumT.Api.Controllers
             IPage<Wallet> page = await _walletRepository.GetPageAsync(pageIndex, pageSize);
             return Ok(page);
         }
+
+        [HttpGet("GetPageWalletsSortBalance")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IPage<Wallet>))]
+        public async Task<IActionResult> GetPageWalletsSortBalance([FromQuery] int pageIndex, [FromQuery] int pageSize)
+        {
+            return Ok();
+        }
     }
 }

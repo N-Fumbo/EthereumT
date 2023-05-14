@@ -8,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 string connectionString = builder.Configuration.GetConnectionString("ApiConntection")
      ?? throw new InvalidOperationException("Connection string 'ApiConntection' not found.");
 
+string infuraApiKey = builder.Configuration.GetValue<string>("InfuraApiKey");
+
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString, m => m.MigrationsAssembly("EthereumT.PgSQL")));
 
 builder.Services.AddControllers();
