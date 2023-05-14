@@ -18,6 +18,7 @@ namespace EthereumT.Api.Infrastructure.Nethereum
 
             _client = new StreamingWebSocketClient($"wss://mainnet.infura.io/ws/v3/{infuraApiKey}");
         }
+
         public async Task SubscribeToReceiveTokenTransferLogsAsync(NewFilterInput filterInput, Action<FilterLog> action)
         {
             if (filterInput is null) throw new ArgumentNullException(nameof(filterInput));
