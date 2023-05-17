@@ -4,19 +4,19 @@ using EthereumT.Api.Infrastructure.Nethereum.Dto;
 using EthereumT.Api.Models.Dto;
 using EthereumT.Common.Extensions;
 using EthereumT.DAL.Repositories.Base;
-using EthereumT.Domain.Base.Entities;
 using EthereumT.Domain.Base.Repositories.Base;
 using EthereumT.Domain.Entities;
 using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
 using System.Numerics;
-using System.Text;
 
 namespace EthereumT.Api.Services
 {
     public class ObserverETHWallets : BackgroundService
     {
+        private const int NUMBER_PLACES_ETH_CURRENCY = 18;
+
         private readonly IMapper _mapper;
 
         private readonly IServiceProvider _serviceProvider;
@@ -61,22 +61,22 @@ namespace EthereumT.Api.Services
                 try
                 {
                     var decoder = Event<TransferEventDTO>.DecodeEvent(log);
-                    if(decoder != null)
+                    if (decoder != null)
                     {
                         if (Data.Wallets.TryGetValue(decoder.Event.To, out WalletDto walletTo))
                         {
                             var newBalance = await NethereumClient.GetBalance(walletTo.Address, web3);
-                            walletTo.Balance = newBalance.ConvertToDecimalWithDecimalPlaces(18);
+                            walletTo.Balance = newBalance.ConvertToDecimalWithDecimalPlaces(NUMBER_PLACES_ETH_CURRENCY);
                         }
 
                         if (Data.Wallets.TryGetValue(decoder.Event.From, out WalletDto walletFrom))
                         {
                             var newBalance = await NethereumClient.GetBalance(walletFrom.Address, web3);
-                            walletFrom.Balance = newBalance.ConvertToDecimalWithDecimalPlaces(18);
+                            walletFrom.Balance = newBalance.ConvertToDecimalWithDecimalPlaces(NUMBER_PLACES_ETH_CURRENCY);
                         }
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     _logger.LogError(ex.Message);
                 }
@@ -105,7 +105,7 @@ namespace EthereumT.Api.Services
                 if (totalPagesCount == -1)
                     totalPagesCount = page.TotalPagesCount;
 
-                foreach(var wallet in page.Items)
+                foreach (var wallet in page.Items)
                 {
                     if (!Data.Wallets.ContainsKey(wallet.Address))
                     {
@@ -113,10 +113,10 @@ namespace EthereumT.Api.Services
                         try
                         {
                             BigInteger balance = await NethereumClient.GetBalance(wallet.Address, web3);
-                            walletDto.Balance = balance.ConvertToDecimalWithDecimalPlaces(18);
+                            walletDto.Balance = balance.ConvertToDecimalWithDecimalPlaces(NUMBER_PLACES_ETH_CURRENCY);
                             Data.Wallets.Add(walletDto.Address, walletDto);
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             _logger.LogError($"Error getting balance ETH: {ex.Message}");
                         }
