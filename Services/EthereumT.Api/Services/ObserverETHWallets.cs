@@ -1,12 +1,17 @@
 ﻿using AutoMapper;
 using EthereumT.Api.Infrastructure.Nethereum;
+using EthereumT.Api.Infrastructure.Nethereum.Dto;
 using EthereumT.Api.Models.Dto;
 using EthereumT.Common.Extensions;
 using EthereumT.DAL.Repositories.Base;
+using EthereumT.Domain.Base.Entities;
 using EthereumT.Domain.Base.Repositories.Base;
 using EthereumT.Domain.Entities;
+using Nethereum.Contracts;
+using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
 using System.Numerics;
+using System.Text;
 
 namespace EthereumT.Api.Services
 {
@@ -38,10 +43,48 @@ namespace EthereumT.Api.Services
 
             await InitWalletsETH(stoppingToken);
 
+            await using NethereumClient client = new(_infuraApiKey);
+
+            string[] address = Data.Wallets.Select(x => x.Key).ToArray();
+
+            NewFilterInput filterTransactions = new()
+            {
+                Address = address,
+                FromBlock = BlockParameter.CreateEarliest(),
+                ToBlock = BlockParameter.CreateLatest(),
+            };
+
+            Web3 web3 = new($"https://mainnet.infura.io/v3/{_infuraApiKey}");
+
+            await client.SubscribeToReceiveTokenTransferLogsAsync(filterTransactions, async log =>
+            {
+                try
+                {
+                    var decoder = Event<TransferEventDTO>.DecodeEvent(log);
+                    if(decoder != null)
+                    {
+                        if (Data.Wallets.TryGetValue(decoder.Event.To, out WalletDto walletTo))
+                        {
+                            var newBalance = await NethereumClient.GetBalance(walletTo.Address, web3);
+                            walletTo.Balance = newBalance.ConvertToDecimalWithDecimalPlaces(18);
+                        }
+
+                        if (Data.Wallets.TryGetValue(decoder.Event.From, out WalletDto walletFrom))
+                        {
+                            var newBalance = await NethereumClient.GetBalance(walletFrom.Address, web3);
+                            walletFrom.Balance = newBalance.ConvertToDecimalWithDecimalPlaces(18);
+                        }
+                    }
+                }
+                catch(Exception ex)
+                {
+                    _logger.LogError(ex.Message);
+                }
+            });
 
             while (!stoppingToken.IsCancellationRequested)
             {
-
+                await Task.Delay(1000, stoppingToken);
             }
         }
 
@@ -49,7 +92,7 @@ namespace EthereumT.Api.Services
         {
             Data.Wallets.Clear();
 
-            const int pageSize = 10;
+            const int pageSize = 250;
 
             int currentPageIndex = 0;
             int totalPagesCount = -1;
@@ -60,7 +103,7 @@ namespace EthereumT.Api.Services
             {
                 IPage<Wallet> page = await _walletsRepository.GetPageAsync(currentPageIndex, pageSize, cancel);
                 if (totalPagesCount == -1)
-                    totalPagesCount = 1;//page.TotalPagesCount;
+                    totalPagesCount = page.TotalPagesCount;
 
                 foreach(var wallet in page.Items)
                 {
