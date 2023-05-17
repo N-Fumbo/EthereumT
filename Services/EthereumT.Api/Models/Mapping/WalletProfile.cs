@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using EthereumT.Api.Controllers.Models.Dto;
+using EthereumT.Api.Models.Dto;
 using EthereumT.Domain.Entities;
 
-namespace EthereumT.Api.Controllers.Models.Mapping
+namespace EthereumT.Api.Models.Mapping
 {
     public class WalletProfile : Profile
     {

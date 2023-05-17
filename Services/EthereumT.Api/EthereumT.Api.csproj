@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Common\EthereumT.Common\EthereumT.Common.csproj" />
     <ProjectReference Include="..\..\DAL\EthereumT.PgSQL\EthereumT.PgSQL.csproj" />
   </ItemGroup>
 

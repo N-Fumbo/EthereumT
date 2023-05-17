@@ -1,4 +1,4 @@
-﻿namespace EthereumT.Api.Controllers.Models.Dto
+﻿namespace EthereumT.Api.Models.Dto
 {
     public class WalletDto
     {
