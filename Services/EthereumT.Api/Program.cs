@@ -11,13 +11,15 @@ var builder = WebApplication.CreateBuilder(args);
 string connectionString = builder.Configuration.GetConnectionString("ApiConntection")
      ?? throw new InvalidOperationException("Connection string 'ApiConntection' not found.");
 
-builder.Services.AddSingleton(builder.Configuration);
-
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString, m => m.MigrationsAssembly("EthereumT.PgSQL")));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddSingleton(builder.Configuration);
+
+builder.Services.AddMemoryCache();
 
 builder.Services.AddAutoMapper(typeof(Program));
 

@@ -15,6 +15,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
     <PackageReference Include="Nethereum.JsonRpc.WebSocketClient" Version="4.14.0" />
     <PackageReference Include="Nethereum.RPC.Reactive" Version="4.14.0" />
     <PackageReference Include="Nethereum.Web3" Version="4.14.0" />

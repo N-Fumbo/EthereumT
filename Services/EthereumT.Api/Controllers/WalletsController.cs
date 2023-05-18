@@ -1,7 +1,10 @@
-﻿using EthereumT.DAL.Repositories.Base;
+﻿using EthereumT.Api.Models.Dto;
+using EthereumT.DAL.Repositories.Base;
+using EthereumT.Domain.Base.Entities;
 using EthereumT.Domain.Base.Repositories.Base;
 using EthereumT.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace EthereumT.Api.Controllers
 {
@@ -9,26 +12,55 @@ namespace EthereumT.Api.Controllers
     [Route("api/[controller]")]
     public class WalletsController : ControllerBase
     {
-        private readonly RepositoryAsync<Wallet> _walletRepository;
+        private readonly IMemoryCache _cache;
 
-        public WalletsController(RepositoryAsync<Wallet> walletsRepository)
+        public WalletsController(IMemoryCache cache)
         {
-            _walletRepository = walletsRepository;
+            _cache = cache;
         }
 
-        [HttpGet("get_page", Name = nameof(GetPage))]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IPage<Wallet>))]
-        public async Task<IActionResult> GetPage([FromQuery] int pageIndex, [FromQuery] int pageSize)
+        [HttpGet(nameof(GetPageWallets))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IPage<WalletDto>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(IPage<WalletDto>))]
+        public IActionResult GetPageWallets([FromQuery] int pageIndex, [FromQuery] int pageSize)
         {
-            IPage<Wallet> page = await _walletRepository.GetPageAsync(pageIndex, pageSize);
-            return Ok(page);
+            if (pageSize <= 0 || pageIndex < 0) return NotFound(new Page<Wallet>(Enumerable.Empty<Wallet>(), pageSize, pageIndex, pageSize));
+
+            if(_cache.TryGetValue("Wallets", out Dictionary<string, WalletDto> wallets))
+            {
+                IEnumerable<WalletDto> result = wallets.Skip(pageIndex * pageSize).Take(pageSize).Select(x => x.Value);
+                return Ok(new Page<WalletDto>(result, wallets.Count, pageIndex, pageSize));
+            }
+
+            return NotFound(new Page<Wallet>(Enumerable.Empty<Wallet>(), pageSize, pageIndex, pageSize));
         }
 
-        [HttpGet("GetPageWalletsSortBalance")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IPage<Wallet>))]
-        public async Task<IActionResult> GetPageWalletsSortBalance([FromQuery] int pageIndex, [FromQuery] int pageSize)
+        [HttpGet(nameof(GetPageWallersSortBalance))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IPage<WalletDto>))]
+        public IActionResult GetPageWallersSortBalance([FromQuery] int pageIndex, [FromQuery] int pageSize)
         {
-            return Ok();
+            if (pageSize <= 0 || pageIndex < 0) return NotFound(new Page<Wallet>(Enumerable.Empty<Wallet>(), pageSize, pageIndex, pageSize));
+
+            if (_cache.TryGetValue("IsActualWalletsSortBalance", out bool isActualSortBalance))
+            {
+                if(!isActualSortBalance is false)
+                {
+                    if (_cache.TryGetValue("Wallets", out Dictionary<string, WalletDto> wallets))
+                    {
+                        IEnumerable<WalletDto> walletsNewSortBalance = wallets.Select(x => x.Value).OrderByDescending(x => x.Balance);
+                        _cache.Set("WalletsSortBalance", walletsNewSortBalance);
+                        _cache.Set("IsActualWalletsSortBalance", true);
+                    }
+                }
+
+                if (_cache.TryGetValue("WalletsSortBalance", out IEnumerable<WalletDto> walletsSortBalance))
+                {
+                    IEnumerable<WalletDto> result = walletsSortBalance.Skip(pageIndex * pageSize).Take(pageSize);
+                    return Ok(new Page<WalletDto>(result, walletsSortBalance.Count(), pageIndex, pageSize));
+                }
+            }
+
+            return NotFound(new Page<Wallet>(Enumerable.Empty<Wallet>(), pageSize, pageIndex, pageSize));
         }
     }
 }

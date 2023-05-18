@@ -22,11 +22,11 @@ namespace EthereumT.DAL.Repositories.Base
 
         public async Task<IPage<T>> GetPageAsync(int pageIndex, int pageSize, CancellationToken cancel = default)
         {
-            if (pageSize <= 0) return new Page(Enumerable.Empty<T>(), pageSize, pageIndex, pageSize);
+            if (pageSize <= 0) return new Page<T>(Enumerable.Empty<T>(), pageSize, pageIndex, pageSize);
 
             var totalCount = await Items.CountAsync(cancel).ConfigureAwait(false);
 
-            if (totalCount == 0) return new Page(Enumerable.Empty<T>(), 0, pageIndex, pageSize);
+            if (totalCount == 0) return new Page<T>(Enumerable.Empty<T>(), 0, pageIndex, pageSize);
 
             IQueryable<T> query = Items;
 
@@ -37,9 +37,10 @@ namespace EthereumT.DAL.Repositories.Base
 
             var items = await query.Take(pageSize).ToArrayAsync(cancel).ConfigureAwait(false);
 
-            return new Page(items, totalCount, pageIndex, pageSize);
+            return new Page<T>(items, totalCount, pageIndex, pageSize);
         }
 
-        protected record Page(IEnumerable<T> Items, int TotalCount, int PageIndex, int PageSize) : IPage<T>;
     }
+
+    public record Page<T>(IEnumerable<T> Items, int TotalCount, int PageIndex, int PageSize) : IPage<T>;
 }
