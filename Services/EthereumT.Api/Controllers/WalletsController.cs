@@ -19,24 +19,9 @@ namespace EthereumT.Api.Controllers
             _cache = cache;
         }
 
-        [HttpGet(nameof(GetPageWallets))]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IPage<WalletDto>))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(IPage<WalletDto>))]
-        public IActionResult GetPageWallets([FromQuery] int pageIndex, [FromQuery] int pageSize)
-        {
-            if (pageSize <= 0 || pageIndex < 0) return NotFound(new Page<Wallet>(Enumerable.Empty<Wallet>(), pageSize, pageIndex, pageSize));
-
-            if(_cache.TryGetValue("Wallets", out Dictionary<string, WalletDto> wallets))
-            {
-                IEnumerable<WalletDto> result = wallets.Skip(pageIndex * pageSize).Take(pageSize).Select(x => x.Value);
-                return Ok(new Page<WalletDto>(result, wallets.Count, pageIndex, pageSize));
-            }
-
-            return NotFound(new Page<Wallet>(Enumerable.Empty<Wallet>(), pageSize, pageIndex, pageSize));
-        }
-
         [HttpGet(nameof(GetPageWallersSortBalance))]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IPage<WalletDto>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(IPage<WalletDto>))]
         public IActionResult GetPageWallersSortBalance([FromQuery] int pageIndex, [FromQuery] int pageSize)
         {
             if (pageSize <= 0 || pageIndex < 0) return NotFound(new Page<Wallet>(Enumerable.Empty<Wallet>(), pageSize, pageIndex, pageSize));

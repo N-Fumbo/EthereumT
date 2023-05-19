@@ -1,5 +1,4 @@
-using AutoMapper;
-using EthereumT.Api.Models.Mapping;
+using EthereumT.Api.Middlewares;
 using EthereumT.Api.Services;
 using EthereumT.DAL.Context;
 using EthereumT.DAL.Repositories.Base;
@@ -34,6 +33,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
