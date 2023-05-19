@@ -24,7 +24,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EthereumT.Api", "Services\E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EthereumT.Web", "EthereumT.Web\EthereumT.Web.csproj", "{85453A6C-56D7-414E-A260-694F8B2D6FEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EthereumT.Common", "Common\EthereumT.Common\EthereumT.Common.csproj", "{5A470B2D-681D-4432-8468-9D53A8C2CE7A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EthereumT.Common", "Common\EthereumT.Common\EthereumT.Common.csproj", "{5A470B2D-681D-4432-8468-9D53A8C2CE7A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

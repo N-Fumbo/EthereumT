@@ -4,16 +4,13 @@ using EthereumT.Api.Infrastructure.Nethereum.Dto;
 using EthereumT.Api.Models.Dto;
 using EthereumT.Common.Extensions;
 using EthereumT.DAL.Repositories.Base;
-using EthereumT.Domain.Base.Entities;
 using EthereumT.Domain.Base.Repositories.Base;
 using EthereumT.Domain.Entities;
-using Microsoft.AspNetCore.Connections.Features;
 using Microsoft.Extensions.Caching.Memory;
 using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
 using System.Numerics;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EthereumT.Api.Services
 {
@@ -102,7 +99,7 @@ namespace EthereumT.Api.Services
         {
             Dictionary<string, WalletDto> wallets = new();
 
-            const int pageSize = 10;//250;
+            const int pageSize = 250;
 
             int currentPageIndex = 0;
             int totalPagesCount = -1;
@@ -113,7 +110,7 @@ namespace EthereumT.Api.Services
             {
                 IPage<Wallet> page = await _walletsRepository.GetPageAsync(currentPageIndex, pageSize, cancel);
                 if (totalPagesCount == -1)
-                    totalPagesCount = 1;//page.TotalPagesCount;
+                    totalPagesCount = page.TotalPagesCount;
 
                 foreach (var wallet in page.Items)
                 {

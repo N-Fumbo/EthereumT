@@ -1,0 +1,59 @@
+﻿@page "/wallets"
+@using EthereumT.DAL.Repositories.Base;
+@using EthereumT.Web.Services
+@using EthereumT.Web.Model
+@using EthereumT.Domain.Base.Repositories.Base;
+@inject WalletService walletService
+
+<h3>Список кошельков</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Адрес</th>
+            <th>Баланс</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var wallet in pageWallets.Items)
+        {
+            <tr>
+                <td>@wallet.Id</td>
+                <td>@wallet.Address</td>
+                <td>@wallet.Balance</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@if (pageWallets.PageIndex > 0)
+{
+    <button class="btn btn-primary" @onclick="LoadPreviousPage">Предыдущая страница</button>
+}
+
+@if (pageWallets.PageIndex < pageWallets.TotalPagesCount - 1)
+{
+    <button class="btn btn-primary" @onclick="LoadNextPage">Следующая страница</button>
+}
+
+@code{
+
+    private IPage<WalletModel> pageWallets = new Page<WalletModel>(Enumerable.Empty<WalletModel>(), 0, 0, 0);
+
+    protected override async Task OnInitializedAsync()
+    {
+        pageWallets = await walletService.GetPageWallets(0, 100);
+    }
+
+    private async Task LoadPreviousPage()
+    {
+        pageWallets = await walletService.GetPageWallets(pageWallets.PageIndex - 1, pageWallets.PageSize);
+    }
+
+    private async Task LoadNextPage()
+    {
+        pageWallets = await walletService.GetPageWallets(pageWallets.PageIndex + 1, pageWallets.PageSize);
+    }
+}

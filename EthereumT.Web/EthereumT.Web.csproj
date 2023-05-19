@@ -6,4 +6,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Common\EthereumT.Domain.Base\EthereumT.Domain.Base.csproj" />
+    <ProjectReference Include="..\Common\EthereumT.Domain\EthereumT.Domain.csproj" />
+    <ProjectReference Include="..\DAL\EthereumT.DAL\EthereumT.DAL.csproj" />
+  </ItemGroup>
+
 </Project>
