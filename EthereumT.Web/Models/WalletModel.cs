@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace EthereumT.Web.Model
+namespace EthereumT.Web.Models
 {
     public class WalletModel
     {

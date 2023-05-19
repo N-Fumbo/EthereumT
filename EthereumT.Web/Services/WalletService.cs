@@ -1,6 +1,6 @@
 ﻿using EthereumT.DAL.Repositories.Base;
 using EthereumT.Domain.Base.Repositories.Base;
-using EthereumT.Web.Model;
+using EthereumT.Web.Models;
 using System.Text.Json;
 
 namespace EthereumT.Web.Services
