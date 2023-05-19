@@ -10,12 +10,15 @@ using Microsoft.Extensions.Caching.Memory;
 using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace EthereumT.Api.Services
 {
     public class ObserverETHWallets : BackgroundService
     {
+        private static readonly object _lockWallet = new();
+
         private const int NUMBER_PLACES_ETH_CURRENCY = 18;
 
         private readonly ILogger<ObserverETHWallets> _logger;
@@ -99,12 +102,14 @@ namespace EthereumT.Api.Services
         {
             Dictionary<string, WalletDto> wallets = new();
 
-            const int pageSize = 250;
+            const int pageSize = 200;
 
             int currentPageIndex = 0;
             int totalPagesCount = -1;
 
             Web3 web3 = new($"https://mainnet.infura.io/v3/{_infuraApiKey}");
+
+            List<Task> getBalanceTasks = new();
 
             do
             {
@@ -114,25 +119,39 @@ namespace EthereumT.Api.Services
 
                 foreach (var wallet in page.Items)
                 {
-                    if (!wallets.ContainsKey(wallet.Address))
+                    getBalanceTasks.Add(Task.Run(async () =>
                     {
-                        WalletDto walletDto = _mapper.Map<WalletDto>(wallet);
-                        try
+                        bool isContainsKey = false;
+                        lock (_lockWallet)
                         {
-                            BigInteger balance = await NethereumClient.GetBalance(wallet.Address, web3);
-                            walletDto.Balance = balance.ConvertToDecimalWithDecimalPlaces(NUMBER_PLACES_ETH_CURRENCY);
-                            wallets.Add(walletDto.Address, walletDto);
+                            isContainsKey = wallets.ContainsKey(wallet.Address);
                         }
-                        catch (Exception ex)
+
+                        if (!isContainsKey)
                         {
-                            _logger.LogError($"Error getting balance ETH: {ex.Message}");
+                            WalletDto walletDto = _mapper.Map<WalletDto>(wallet);
+                            try
+                            {
+                                BigInteger balance = await NethereumClient.GetBalance(wallet.Address, web3);
+                                walletDto.Balance = balance.ConvertToDecimalWithDecimalPlaces(NUMBER_PLACES_ETH_CURRENCY);
+                                lock (_lockWallet)
+                                {
+                                    wallets.Add(walletDto.Address, walletDto);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError($"Error getting balance ETH: {ex.Message}");
+                            }
                         }
-                    }
+                    }, cancel));
                 }
 
                 currentPageIndex++;
 
             } while (currentPageIndex < totalPagesCount);
+
+            await Task.WhenAll(getBalanceTasks);
 
             IEnumerable<WalletDto> walletsSortBalance = wallets.Select(x => x.Value).OrderByDescending(x => x.Balance);
 
