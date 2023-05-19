@@ -18,11 +18,19 @@ namespace EthereumT.Web.Services
         {
             var response = await _httpClient.GetAsync($"https://localhost:7282/api/Wallets/GetPageWallersSortBalance?pageIndex={pageIndex}&pageSize={pageSize}");
 
-            var content = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+            {
 
-            Page<WalletModel> page = JsonSerializer.Deserialize<Page<WalletModel>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true});
+                var content = await response.Content.ReadAsStringAsync();
 
-            return page;
+                Page<WalletModel> page = JsonSerializer.Deserialize<Page<WalletModel>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                return page;
+            }
+            else
+            {
+                return new Page<WalletModel>(Enumerable.Empty<WalletModel>(), 0, pageIndex, pageSize);
+            }
         }
     }
 }
