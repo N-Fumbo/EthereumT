@@ -1,0 +1,64 @@
+﻿@inject WalletService walletService
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead class="thead-light">
+            <tr>
+                <th>Address</th>
+                <th>Balance ETH</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (_wallets is null)
+            {
+                <tr>Loading data...</tr>
+            }
+            else if (_wallets.Items.Count() == 0)
+            {
+                <tr>No items in array</tr>
+            }
+            else
+            {
+                @foreach (var wallet in _wallets.Items)
+                {
+                    <tr>
+                        <td>@wallet.Address</td>
+                        <td>@wallet.Balance</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (_wallets is not null && _wallets.Items.Count() > 0)
+{
+    @if (_wallets.PageIndex > 0)
+    {
+        <button class="btn btn-primary" @onclick="LoadPreviousPage">Предыдущая страница</button>
+    }
+
+    @if (_wallets.PageIndex < _wallets.TotalPagesCount - 1)
+    {
+        <button class="btn btn-primary" @onclick="LoadNextPage">Следующая страница</button>
+    }
+}
+
+@code {
+    private IPage<WalletModel> _wallets { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _wallets = await walletService.GetPageWallets(0, 100);
+    }
+
+    private async Task LoadPreviousPage()
+    {
+        _wallets = await walletService.GetPageWallets(_wallets.PageIndex - 1, _wallets.PageSize);
+    }
+
+    private async Task LoadNextPage()
+    {
+        _wallets = await walletService.GetPageWallets(_wallets.PageIndex + 1, _wallets.PageSize);
+    }
+}
