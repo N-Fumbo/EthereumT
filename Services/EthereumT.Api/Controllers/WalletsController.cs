@@ -21,7 +21,7 @@ namespace EthereumT.Api.Controllers
 
         [HttpGet(nameof(GetPageWallersSortBalance))]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IPage<WalletDto>))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(IPage<WalletDto>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public IActionResult GetPageWallersSortBalance([FromQuery] int pageIndex, [FromQuery] int pageSize)
         {
             if (pageSize <= 0 || pageIndex < 0) return NotFound(new Page<Wallet>(Enumerable.Empty<Wallet>(), pageSize, pageIndex, pageSize));
@@ -44,8 +44,8 @@ namespace EthereumT.Api.Controllers
                     return Ok(new Page<WalletDto>(result, walletsSortBalance.Count(), pageIndex, pageSize));
                 }
             }
-
-            return NotFound(new Page<Wallet>(Enumerable.Empty<Wallet>(), pageSize, pageIndex, pageSize));
+            
+            return NoContent();
         }
     }
 }
