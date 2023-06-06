@@ -10,9 +10,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EthereumT.Domain.Base", "Common\EthereumT.Domain.Base\EthereumT.Domain.Base.csproj", "{6582CDE3-E6A5-43D9-BB14-59BA79330A04}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DAL", "DAL", "{2B66FA5C-8FF5-4B1C-BC64-67A5055C52AC}"
-	ProjectSection(SolutionItems) = preProject
-		Common\EthereumT.Domain.Base\Repositories\Base\IRepositoryAsync.cs = Common\EthereumT.Domain.Base\Repositories\Base\IRepositoryAsync.cs
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EthereumT.DAL", "DAL\EthereumT.DAL\EthereumT.DAL.csproj", "{60143D93-D918-413E-B39B-19DA2EBF2C3F}"
 EndProject

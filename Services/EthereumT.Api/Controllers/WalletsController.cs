@@ -1,6 +1,5 @@
 ﻿using EthereumT.Api.Models.Dto;
 using EthereumT.DAL.Repositories.Base;
-using EthereumT.Domain.Base.Entities;
 using EthereumT.Domain.Base.Repositories.Base;
 using EthereumT.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +27,7 @@ namespace EthereumT.Api.Controllers
 
             if (_cache.TryGetValue("IsActualWalletsSortBalance", out bool isActualSortBalance))
             {
-                if(!isActualSortBalance is false)
+                if (!isActualSortBalance is false)
                 {
                     if (_cache.TryGetValue("Wallets", out Dictionary<string, WalletDto> wallets))
                     {
@@ -44,7 +43,7 @@ namespace EthereumT.Api.Controllers
                     return Ok(new Page<WalletDto>(result, walletsSortBalance.Count(), pageIndex, pageSize));
                 }
             }
-            
+
             return NoContent();
         }
     }
